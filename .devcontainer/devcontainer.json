@@ -1,0 +1,19 @@
+{
+  "name": "Laravel 12 API with Nginx",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/var/www/html",
+  "customizations": {
+    "vscode" : {
+        "settings": {
+            "terminal.integrated.defaultProfile.linux": "bash"
+        },
+        "extensions" : [
+            "bmewburn.vscode-intelephense-client",
+            "xdebug.php-debug",
+            "ms-azuretools.vscode-docker"
+        ]
+    }
+  },
+  "postCreateCommand": "composer install && php artisan key:generate"
+}
