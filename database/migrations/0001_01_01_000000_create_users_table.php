@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->string('cpf_cnpj')->unique();
+            $table->enum('type', ['customer', 'shopkeeper']);
             $table->string('password');
+            $table->decimal('balance', 15, 2)->default(0);
             $table->rememberToken();
             $table->timestamps();
         });
