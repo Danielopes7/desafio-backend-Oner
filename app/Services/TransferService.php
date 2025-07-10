@@ -9,11 +9,16 @@ use Illuminate\Support\Facades\DB;
 use App\Enums\TransactionType;
 use App\Enums\TransactionStatus;
 use App\Jobs\SendTransactionNotification;
+use App\Actions\AuthorizeTransferAction;
 
 use Exception;
 
 class TransferService
 {
+    public function __construct(
+        private AuthorizeTransferAction $authorizeTransfer
+    ) {}
+
     public function execTransfer($data): Transaction
     {
         DB::beginTransaction();
@@ -39,6 +44,20 @@ class TransferService
 
             $sender->decrement('balance', $data->amount);
             $recipient->increment('balance', $data->amount);
+
+            ($this->authorizeTransfer)([
+                'origin' => [
+                    'cpfcnpj' => $sender->cpf_cnpj,
+                    'name'    => $sender->name,
+                    'balance' => number_format($sender->balance, 2, '.', ''),
+                ],
+                'destination' => [
+                    'cpfcnpj' => $recipient->cpf_cnpj,
+                    'name'    => $recipient->name,
+                    'balance' => number_format($recipient->balance, 2, '.', ''),
+                ],
+                'amount' => $data->amount,
+            ]);
 
             $transaction = Transaction::create([
                 'payer_id' => $sender->id,
