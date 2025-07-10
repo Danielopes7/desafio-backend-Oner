@@ -47,6 +47,8 @@ Projeto backend desenvolvido com Laravel para simular operações financeiras entr
 
 4. Rode as migrations dentro do container:
    ```bash
+   composer install
+   php artisan key:generate
    php artisan migrate 
    ```
 
