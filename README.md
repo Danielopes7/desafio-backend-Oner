@@ -88,7 +88,7 @@ Projeto backend desenvolvido com Laravel para simular operações financeiras entr
 	"status": "success",
 	"message": "Successfully registered",
 	"user": {
-		"name": "shopkeeper",
+		"name": "User Name",
 		"email": "user@example.com",
 		"type": "customer"
 	}
