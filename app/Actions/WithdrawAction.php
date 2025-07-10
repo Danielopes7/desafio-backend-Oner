@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Actions;
+
+use App\Models\User;
+use App\Models\Transaction;
+use App\Enums\TransactionType;
+use App\Enums\TransactionStatus;
+
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Exception;
+
+class WithdrawAction
+{
+    public function handle(object $data): Transaction
+    {
+        return DB::transaction(function () use ($data) {
+            $user_id = Auth::id();
+            $user = User::findOrFail($user_id);
+
+            $user->decrement('balance', $data->amount);
+
+            return Transaction::create([
+                'payer_id' => $user->id,
+                'payee_id' => $user->id,
+                'type'     => TransactionType::WITHDRAW,
+                'amount'   => $data->amount,
+                'status'   => TransactionStatus::APPROVED,
+            ]);
+        });
+    }
+}
+
+
