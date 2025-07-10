@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Enums\TransactionType;
 use App\Enums\TransactionStatus;
+use App\Jobs\SendTransactionNotification;
 
 use Exception;
 
@@ -46,12 +47,9 @@ class TransferService
                 'amount'   => $data->amount,
                 'status'   => TransactionStatus::APPROVED,
             ]);
-
-            // Notificar (mock ou real)
-            // Notification::send($recipient, new TransferReceivedNotification(...));
-
+            
             DB::commit();
-
+            SendTransactionNotification::dispatch($sender, $recipient, $data->amount);
             return $transaction;
 
         } catch (Exception $e) {
