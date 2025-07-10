@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('type', ['transfer', 'withdraw', 'deposit', 'refund']);
             $table->decimal('amount', 15, 2);
             $table->enum('status', ['pending', 'approved'])->default('pending');
+            $table->boolean('is_refunded')->default(false);
 
             $table->timestamps();
         });

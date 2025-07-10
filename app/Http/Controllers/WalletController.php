@@ -19,7 +19,8 @@ class WalletController extends Controller
     {
         try{
             $transaction = $this->depositAction->handle($request);
-    
+            $transaction->load('payer');
+
             return response()->json([
                 'response_code' => 200,
                 'status' => 'success',
@@ -39,6 +40,7 @@ class WalletController extends Controller
     {
         try{
             $transaction = $this->withdrawAction->handle($request);
+            $transaction->load('payer');
 
             return response()->json([
                 'response_code' => 200,

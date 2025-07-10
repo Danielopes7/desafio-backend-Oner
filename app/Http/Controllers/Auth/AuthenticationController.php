@@ -19,11 +19,12 @@ class AuthenticationController extends Controller
     public function register(RegisterRequest $request)
     {
         try {
-
+            $user = $this->authService->register($request);
             return response()->json([
                 'response_code' => 201,
                 'status'        => 'success',
                 'message'       => 'Successfully registered',
+                'user'          => $user->only(['name', 'email', 'type']),
             ], 201);
 
         } catch (\Exception $e) {
@@ -39,7 +40,7 @@ class AuthenticationController extends Controller
     {
 
         try {
-            $token = $this->authService->login($request);
+            $token = $this->authService->login($request->validated());
 
             if (!$token) {
                 return response()->json([
@@ -56,8 +57,10 @@ class AuthenticationController extends Controller
                 'status'        => 'success',
                 'message'       => 'Login successful',
                 'user_info'     => [
+                    'id'  => $user->id,
                     'name'  => $user->name,
                     'email' => $user->email,
+                    'type' => $user->type,
                 ],
                 'token'       => $token,
                 'token_type'  => 'Bearer',

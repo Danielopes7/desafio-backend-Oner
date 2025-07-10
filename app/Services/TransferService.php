@@ -78,6 +78,10 @@ class TransferService
                 ->where('type', TransactionType::TRANSFER)
                 ->first();
 
+            if ($Transaction_refund && $Transaction_refund->is_refunded) {
+                throw new Exception('This transaction has already been refunded.');
+            }
+
             if (!$Transaction_refund) {
                 throw new Exception('Transaction not found or not eligible for refund.');
             }
@@ -94,7 +98,8 @@ class TransferService
                 'amount'   => $Transaction_refund->amount,
                 'status'   => TransactionStatus::APPROVED,
             ]);
-
+            $Transaction_refund->is_refunded = true;
+            $Transaction_refund->save();
             // Notificar (mock ou real)
             // Notification::send($sender, new TransferRefundedNotification(...));
 

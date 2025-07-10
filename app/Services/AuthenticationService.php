@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthenticationService
 {
-    public function register(array $data): User
+    public function register($data): User
     {
         return User::create([
             'name'     => $data['name'],
@@ -19,7 +19,7 @@ class AuthenticationService
         ]);
     }
 
-    public function login(object $credentials): ?string
+    public function login($credentials): ?string
     {
         if (!Auth::attempt($credentials)) {
             return null;
