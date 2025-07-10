@@ -16,14 +16,14 @@ Projeto backend desenvolvido com Laravel para simular operações financeiras entr
 1. Instale as dependências:
    ```bash
    composer install
-   npm install
    ```
 
 2. Configure o `.env` com as credenciais do banco de dados e serviços externos.
 
-3. Rode as migrations e seeds:
+3. Rode as migrations e gere a key:
    ```bash
-   php artisan migrate --seed
+   php artisan key:generate
+   php artisan migrate
    ```
 
 4. Inicie o servidor:
