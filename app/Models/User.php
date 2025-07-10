@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Enums\UserType;
 
 class User extends Authenticatable
 {
@@ -51,6 +52,11 @@ class User extends Authenticatable
 
     public function canTransfer()
     {
-        return $this->type === 'customer';
+        return $this->type == UserType::CUSTOMER->value;
+    }
+
+    public function canRefund()
+    {
+        return $this->type == UserType::SHOPKEEPER->value;
     }
 }

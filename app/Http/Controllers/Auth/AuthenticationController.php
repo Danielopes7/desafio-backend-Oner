@@ -5,47 +5,28 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
-use App\Models\User;
+use App\Services\AuthenticationService;
+use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
 
 class AuthenticationController extends Controller
 {
-    public function register(Request $request)
+    public function __construct(protected AuthenticationService $authService)
+    {
+    }
+
+    public function register(RegisterRequest $request)
     {
         try {
-            $validated = $request->validate([
-                'name'     => 'required|string|min:4',
-                'email'    => 'required|string|email|max:255|unique:users',
-                'password' => 'required|string|min:8',
-                'document' => 'required|string|unique:users,cpf_cnpj',
-                'type'     => 'required|in:customer,shopkeeper',
-            ]);
-
-            User::create([
-                'name'     => $validated['name'],
-                'email'    => $validated['email'],
-                'cpf_cnpj' => $validated['document'],
-                'type' => $validated['type'],
-                'password' => Hash::make($validated['password']),
-            ]);
 
             return response()->json([
                 'response_code' => 201,
                 'status'        => 'success',
                 'message'       => 'Successfully registered',
             ], 201);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'response_code' => 422,
-                'status'        => 'error',
-                'message'       => 'Validation failed',
-                'errors'        => $e->errors(),
-            ], 422);
-        } catch (\Exception $e) {
-            Log::error('Registration Error: ' . $e->getMessage());
 
+        } catch (\Exception $e) {
             return response()->json([
                 'response_code' => 500,
                 'status'        => 'error',
@@ -54,15 +35,13 @@ class AuthenticationController extends Controller
         }
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        try {
-            $credentials = $request->validate([
-                'email'    => 'required|email',
-                'password' => 'required|string',
-            ]);
 
-            if (!Auth::attempt($credentials)) {
+        try {
+            $token = $this->authService->login($request);
+
+            if (!$token) {
                 return response()->json([
                     'response_code' => 401,
                     'status'        => 'error',
@@ -71,7 +50,6 @@ class AuthenticationController extends Controller
             }
 
             $user = Auth::user();
-            $token = $user->createToken('authToken')->plainTextToken;
 
             return response()->json([
                 'response_code' => 200,
@@ -84,16 +62,7 @@ class AuthenticationController extends Controller
                 'token'       => $token,
                 'token_type'  => 'Bearer',
             ]);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'response_code' => 422,
-                'status'        => 'error',
-                'message'       => 'Validation failed',
-                'errors'        => $e->errors(),
-            ], 422);
         } catch (\Exception $e) {
-            Log::error('Login Error: ' . $e->getMessage());
-
             return response()->json([
                 'response_code' => 500,
                 'status'        => 'error',
@@ -107,24 +76,22 @@ class AuthenticationController extends Controller
         try {
             $user = $request->user();
 
-            if ($user) {
-                $user->tokens()->delete();
-
+            if (!$user) {
                 return response()->json([
-                    'response_code' => 200,
-                    'status'        => 'success',
-                    'message'       => 'Successfully logged out',
-                ]);
+                    'response_code' => 401,
+                    'status'        => 'error',
+                    'message'       => 'User not authenticated',
+                ], 401);
             }
 
-            return response()->json([
-                'response_code' => 401,
-                'status'        => 'error',
-                'message'       => 'User not authenticated',
-            ], 401);
-        } catch (\Exception $e) {
-            Log::error('Logout Error: ' . $e->getMessage());
+            $this->authService->logout($user);
 
+            return response()->json([
+                'response_code' => 200,
+                'status'        => 'success',
+                'message'       => 'Successfully logged out',
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'response_code' => 500,
                 'status'        => 'error',
