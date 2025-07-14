@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Tests\TestCase;
 
 class AuthenticationApiTest extends TestCase
 {
@@ -79,7 +79,7 @@ class AuthenticationApiTest extends TestCase
         ]);
     }
 
-     public function test_api_login_returns_expected_response()
+    public function test_api_login_returns_expected_response()
     {
         User::factory()->create([
             'name' => 'daniel',
@@ -100,7 +100,7 @@ class AuthenticationApiTest extends TestCase
                 'message' => 'Login successful',
                 'user_info' => [
                     'name' => 'daniel',
-                    'email' => 'daniel@example.com'
+                    'email' => 'daniel@example.com',
                 ],
             ])
             ->assertJsonStructure([
@@ -109,10 +109,10 @@ class AuthenticationApiTest extends TestCase
                 'message',
                 'user_info' => [
                     'name',
-                    'email'
+                    'email',
                 ],
                 'token',
-                'token_type'
+                'token_type',
             ]);
     }
 
@@ -133,23 +133,22 @@ class AuthenticationApiTest extends TestCase
         $token = $loginResponse->json('token');
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ])->postJson('/api/logout');
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'response_code' => 200,
-                     'status' => 'success',
-                     'message' => 'Successfully logged out'
-                 ]);
+            ->assertJson([
+                'response_code' => 200,
+                'status' => 'success',
+                'message' => 'Successfully logged out',
+            ]);
 
         $protectedResponse = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ])->postJson('/api/transfer', [
             'payee_id' => 1,
-            'amount' => 10
+            'amount' => 10,
         ]);
         $protectedResponse->assertStatus(400);
     }
-
 }

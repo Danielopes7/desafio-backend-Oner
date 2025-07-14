@@ -22,11 +22,11 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'     => 'required|string|min:4',
-            'email'    => 'required|string|email|max:255|unique:users',
+            'name' => 'required|string|min:4',
+            'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'document' => 'required|string|unique:users,cpf_cnpj',
-            'type'     => 'required|in:customer,shopkeeper',
+            'type' => 'required|in:customer,shopkeeper',
         ];
     }
 }

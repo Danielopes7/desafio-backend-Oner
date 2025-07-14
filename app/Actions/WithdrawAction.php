@@ -2,14 +2,13 @@
 
 namespace App\Actions;
 
-use App\Models\User;
-use App\Models\Transaction;
-use App\Enums\TransactionType;
 use App\Enums\TransactionStatus;
-
+use App\Enums\TransactionType;
+use App\Models\Transaction;
+use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Exception;
 
 class WithdrawAction
 {
@@ -28,12 +27,10 @@ class WithdrawAction
             return Transaction::create([
                 'payer_id' => $user->id,
                 'payee_id' => $user->id,
-                'type'     => TransactionType::WITHDRAW,
-                'amount'   => $data->amount,
-                'status'   => TransactionStatus::APPROVED,
+                'type' => TransactionType::WITHDRAW,
+                'amount' => $data->amount,
+                'status' => TransactionStatus::APPROVED,
             ]);
         });
     }
 }
-
-

@@ -2,16 +2,15 @@
 
 namespace App\Services;
 
-use App\Models\User;
+use App\Actions\AuthorizeTransferAction;
+use App\Enums\TransactionStatus;
+use App\Enums\TransactionType;
+use App\Jobs\SendTransactionNotification;
 use App\Models\Transaction;
+use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Enums\TransactionType;
-use App\Enums\TransactionStatus;
-use App\Jobs\SendTransactionNotification;
-use App\Actions\AuthorizeTransferAction;
-
-use Exception;
 
 class TransferService
 {
@@ -27,18 +26,17 @@ class TransferService
             $user_id = Auth::id();
             $sender = User::findOrFail($user_id);
 
-            if (!$sender->canTransfer()) {
+            if (! $sender->canTransfer()) {
                 throw new Exception('Only customers are allowed to make transfers.');
             }
-            
+
             if ($user_id == $data->payee_id) {
                 throw new Exception('Not allowed to transfer to yourself.');
             }
-            
+
             if ($sender->balance < $data->amount) {
                 throw new Exception('Insufficient balance.');
             }
-            
 
             $recipient = User::findOrFail($data->payee_id);
 
@@ -48,12 +46,12 @@ class TransferService
             ($this->authorizeTransfer)([
                 'origin' => [
                     'cpfcnpj' => $sender->cpf_cnpj,
-                    'name'    => $sender->name,
+                    'name' => $sender->name,
                     'balance' => number_format($sender->balance, 2, '.', ''),
                 ],
                 'destination' => [
                     'cpfcnpj' => $recipient->cpf_cnpj,
-                    'name'    => $recipient->name,
+                    'name' => $recipient->name,
                     'balance' => number_format($recipient->balance, 2, '.', ''),
                 ],
                 'amount' => $data->amount,
@@ -62,13 +60,14 @@ class TransferService
             $transaction = Transaction::create([
                 'payer_id' => $sender->id,
                 'payee_id' => $recipient->id,
-                'type'     => TransactionType::TRANSFER,
-                'amount'   => $data->amount,
-                'status'   => TransactionStatus::APPROVED,
+                'type' => TransactionType::TRANSFER,
+                'amount' => $data->amount,
+                'status' => TransactionStatus::APPROVED,
             ]);
-            
+
             DB::commit();
             SendTransactionNotification::dispatch($sender, $recipient, $data->amount);
+
             return $transaction;
 
         } catch (Exception $e) {
@@ -77,7 +76,7 @@ class TransferService
         }
     }
 
-    public function execRefund($data): Transaction 
+    public function execRefund($data): Transaction
     {
         DB::beginTransaction();
 
@@ -85,7 +84,7 @@ class TransferService
             $user_id = Auth::id();
             $sender = User::findOrFail($user_id);
 
-            if (!$sender->canRefund()) {
+            if (! $sender->canRefund()) {
                 throw new Exception('Only shopkeeper are allowed to make refunds.');
             }
 
@@ -99,10 +98,10 @@ class TransferService
                 throw new Exception('This transaction has already been refunded.');
             }
 
-            if (!$Transaction_refund) {
+            if (! $Transaction_refund) {
                 throw new Exception('Transaction not found or not eligible for refund.');
             }
-            
+
             $recipient = User::findOrFail($Transaction_refund->payer_id);
 
             $recipient->increment('balance', $Transaction_refund->amount);
@@ -111,9 +110,9 @@ class TransferService
             $transaction = Transaction::create([
                 'payer_id' => $sender->id,
                 'payee_id' => $recipient->id,
-                'type'     => TransactionType::REFUND,
-                'amount'   => $Transaction_refund->amount,
-                'status'   => TransactionStatus::APPROVED,
+                'type' => TransactionType::REFUND,
+                'amount' => $Transaction_refund->amount,
+                'status' => TransactionStatus::APPROVED,
             ]);
             $Transaction_refund->is_refunded = true;
             $Transaction_refund->save();

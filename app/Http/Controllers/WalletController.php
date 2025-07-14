@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\DepositRequest;
-use App\Http\Requests\WithdrawRequest;
 use App\Actions\DepositAction;
 use App\Actions\WithdrawAction;
-use Illuminate\Http\Request;
+use App\Http\Requests\DepositRequest;
+use App\Http\Requests\WithdrawRequest;
 
 class WalletController extends Controller
 {
@@ -17,7 +16,7 @@ class WalletController extends Controller
 
     public function deposit(DepositRequest $request)
     {
-        try{
+        try {
             $transaction = $this->depositAction->handle($request);
             $transaction->load('payer');
 
@@ -38,7 +37,7 @@ class WalletController extends Controller
 
     public function withdraw(WithdrawRequest $request)
     {
-        try{
+        try {
             $transaction = $this->withdrawAction->handle($request);
             $transaction->load('payer');
 

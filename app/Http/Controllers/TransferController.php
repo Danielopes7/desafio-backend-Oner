@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\TransferService;
-use App\Http\Requests\TransferRequest;
 use App\Http\Requests\RefundRequest;
-use Illuminate\Http\Request;
+use App\Http\Requests\TransferRequest;
+use App\Services\TransferService;
 
 class TransferController extends Controller
 {
@@ -13,9 +12,9 @@ class TransferController extends Controller
 
     public function transfer(TransferRequest $request)
     {
-        try{
+        try {
             $transaction = $this->transferService->execTransfer($request);
-    
+
             return response()->json([
                 'response_code' => 200,
                 'status' => 'success',
@@ -35,7 +34,7 @@ class TransferController extends Controller
     {
         try {
             $transaction = $this->transferService->execRefund($request);
-    
+
             return response()->json([
                 'response_code' => 200,
                 'status' => 'success',
@@ -50,5 +49,4 @@ class TransferController extends Controller
             ], 400);
         }
     }
-
 }

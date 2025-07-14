@@ -28,7 +28,7 @@ class WalletApiTest extends TestCase
 
         $depositAmount = 150;
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ])->postJson('/api/deposit', [
             'amount' => $depositAmount,
         ]);
@@ -58,14 +58,14 @@ class WalletApiTest extends TestCase
 
         $withdrawAmount = 120;
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ])->postJson('/api/withdraw', [
             'amount' => $withdrawAmount,
         ]);
 
         $response->assertStatus(200)
             ->assertJson([
-                'status' => 'success',  
+                'status' => 'success',
             ]);
 
         $this->assertEquals(180, $user->fresh()->balance);

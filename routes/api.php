@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\TransferController;
 use App\Http\Controllers\WalletController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 Route::post('register', [AuthenticationController::class, 'register']);
 Route::post('login', [AuthenticationController::class, 'login']);
@@ -18,6 +17,3 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/withdraw', [WalletController::class, 'withdraw']);
     Route::post('/deposit', [WalletController::class, 'deposit']);
 });
-
-
-

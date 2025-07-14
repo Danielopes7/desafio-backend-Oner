@@ -2,7 +2,6 @@
 
 namespace Tests\Unit;
 
-use App\Models\User;
 use App\Services\AuthenticationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +13,7 @@ class AuthenticationServiceTest extends TestCase
 
     public function test_register_creates_a_user()
     {
-        $service = new AuthenticationService();
+        $service = new AuthenticationService;
         $data = [
             'name' => 'Teste',
             'email' => 'teste@teste.com',
@@ -26,7 +25,7 @@ class AuthenticationServiceTest extends TestCase
         $user = $service->register($data);
 
         $this->assertDatabaseHas('users', [
-            'email' => 'teste@teste.com'
+            'email' => 'teste@teste.com',
         ]);
         $this->assertTrue(Hash::check('senha123', $user->password));
     }

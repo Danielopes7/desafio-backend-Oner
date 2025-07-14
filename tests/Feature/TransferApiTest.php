@@ -18,14 +18,14 @@ class TransferApiTest extends TestCase
             'email' => 'customer@example.com',
             'password' => Hash::make('password123'),
             'balance' => 1000,
-            'type' => 'customer'
+            'type' => 'customer',
         ]);
         $payee = User::factory()->create([
             'name' => 'shopkeeper',
             'email' => 'shopkeeper@example.com',
             'password' => Hash::make('password123'),
             'balance' => 100,
-            'type' => 'shopkeeper'
+            'type' => 'shopkeeper',
         ]);
 
         $loginResponse = $this->postJson('/api/login', [
@@ -40,7 +40,7 @@ class TransferApiTest extends TestCase
             'amount' => 200,
         ];
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ])->postJson('/api/transfer', $transferPayload);
 
         $response->assertStatus(200)
@@ -51,5 +51,4 @@ class TransferApiTest extends TestCase
         $this->assertEquals(800, $payer->fresh()->balance);
         $this->assertEquals(300, $payee->fresh()->balance);
     }
-
 }

@@ -26,5 +26,4 @@ class TransferRequest extends FormRequest
             'payee_id' => 'required|exists:users,id',
         ];
     }
-
 }

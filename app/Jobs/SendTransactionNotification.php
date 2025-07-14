@@ -5,13 +5,13 @@ namespace App\Jobs;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Foundation\Bus\Dispatchable;
 
 class SendTransactionNotification implements ShouldQueue
 {
-    use Queueable, Dispatchable;
+    use Dispatchable, Queueable;
 
     public function __construct(
         private User $sender,
@@ -40,19 +40,19 @@ class SendTransactionNotification implements ShouldQueue
 
     private function sendNotification(string $to, string $senderName, string $recipientName, string $message): void
     {
-        $sender     = mb_convert_encoding($senderName, 'UTF-8', 'UTF-8');
-        $recipient  = mb_convert_encoding($recipientName, 'UTF-8', 'UTF-8');
-        $message    = mb_convert_encoding($message, 'UTF-8', 'UTF-8');
+        $sender = mb_convert_encoding($senderName, 'UTF-8', 'UTF-8');
+        $recipient = mb_convert_encoding($recipientName, 'UTF-8', 'UTF-8');
+        $message = mb_convert_encoding($message, 'UTF-8', 'UTF-8');
 
         $response = Http::post('https://66ad1f3cb18f3614e3b478f5.mockapi.io/v1/send', [
-            'sender'     => $sender,
-            'to'         => $to,
-            'recipient'  => $recipient,
-            'message'    => $message,
+            'sender' => $sender,
+            'to' => $to,
+            'recipient' => $recipient,
+            'message' => $message,
         ]);
 
         if ($response->failed()) {
-            Log::error('Error sending notification: ' . $response->body());
+            Log::error('Error sending notification: '.$response->body());
         }
 
     }
