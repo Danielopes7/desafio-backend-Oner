@@ -290,7 +290,73 @@ Projeto backend desenvolvido com Laravel para simular operações financeiras entr
 	}
 }
 ```
-> Todas as rotas (exceto register e login) exigem autenticação via token.
+## GET /api/admin/users
+
+**Header:**
+*X-Admin True*
+
+
+**Response (200 OK):**
+
+```json
+[
+	{
+		"id": 1,
+		"name": "User Name",
+		"email": "user@example.com",
+		"cpf_cnpj": "12345678900",
+		"type": "customer",
+		"balance": "80.22",
+		"created_at": "2025-07-10T07:58:19.000000Z",
+		"updated_at": "2025-07-10T13:24:18.000000Z"
+	},
+	{
+		"id": 2,
+		"name": "shopkeeper",
+		"email": "shopkeeper@example.com",
+		"cpf_cnpj": "61075342372",
+		"type": "shopkeeper",
+		"balance": "130.44",
+		"created_at": "2025-07-10T07:58:33.000000Z",
+		"updated_at": "2025-07-14T19:15:51.000000Z"
+	},
+]
+```
+
+## GET /api/admin/transfers
+
+**Header:**
+*X-Admin True*
+
+
+**Response (200 OK):**
+
+```json
+[
+	{
+		"id": 1,
+		"payer_id": 1,
+		"payee_id": 1,
+		"type": "deposit",
+		"amount": "100.22",
+		"status": "approved",
+		"is_refunded": 0,
+		"created_at": "2025-07-10T08:00:00.000000Z",
+		"updated_at": "2025-07-10T08:00:00.000000Z"
+	},
+	{
+		"id": 2,
+		"payer_id": 1,
+		"payee_id": 2,
+		"type": "transfer",
+		"amount": "10.00",
+		"status": "approved",
+		"is_refunded": 0,
+		"created_at": "2025-07-10T08:01:47.000000Z",
+		"updated_at": "2025-07-10T08:01:47.000000Z"
+	},
+]
+```
 
 ## Testes
 
