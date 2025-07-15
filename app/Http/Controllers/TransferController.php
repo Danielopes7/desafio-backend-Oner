@@ -5,10 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Requests\RefundRequest;
 use App\Http\Requests\TransferRequest;
 use App\Services\TransferService;
+use App\Models\Transaction;
+use Illuminate\Http\Request;
 
 class TransferController extends Controller
 {
     public function __construct(protected TransferService $transferService) {}
+
+    public function index(Request $request)
+    {
+        return Transaction::all();
+    }
 
     public function transfer(TransferRequest $request)
     {

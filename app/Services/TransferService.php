@@ -84,10 +84,6 @@ class TransferService
             $user_id = Auth::id();
             $sender = User::findOrFail($user_id);
 
-            if (! $sender->canRefund()) {
-                throw new Exception('Only shopkeeper are allowed to make refunds.');
-            }
-
             $Transaction_refund = Transaction::where('id', $data->transaction_id)
                 ->where('payee_id', $user_id)
                 ->where('status', TransactionStatus::APPROVED)
@@ -116,8 +112,6 @@ class TransferService
             ]);
             $Transaction_refund->is_refunded = true;
             $Transaction_refund->save();
-            // Notificar (mock ou real)
-            // Notification::send($sender, new TransferRefundedNotification(...));
 
             DB::commit();
 
