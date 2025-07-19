@@ -41,7 +41,7 @@ class StatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-arrow-down-tray')
                 ->color('success'),
             Stat::make('Refunds Received', 'R$ ' . number_format(Transaction::where('payee_id', Auth::id())->where('type', 'refund')->sum('amount'), 2, ',', '.'))
-                ->description('Withdraw')
+                ->description('Refund')
                 ->descriptionIcon('heroicon-m-arrows-right-left')
                 ->color('warning'),
         ];
