@@ -14,14 +14,11 @@ class DepositAction
     public function handle(object $data): Transaction
     {
         return DB::transaction(function () use ($data) {
-            $user_id = Auth::id();
-            $user = User::findOrFail($user_id);
-
-            $user->increment('balance', $data->amount);
+            User::where('id', Auth::id())->increment('balance', $data->amount);
 
             return Transaction::create([
-                'payer_id' => $user->id,
-                'payee_id' => $user->id,
+                'payer_id' => Auth::id(),
+                'payee_id' => Auth::id(),
                 'type' => TransactionType::DEPOSIT,
                 'amount' => $data->amount,
                 'status' => TransactionStatus::APPROVED,
