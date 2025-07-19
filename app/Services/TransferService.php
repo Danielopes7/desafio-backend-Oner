@@ -84,34 +84,38 @@ class TransferService
             $user_id = Auth::id();
             $sender = User::findOrFail($user_id);
 
-            $Transaction_refund = Transaction::where('id', $data->transaction_id)
+            $transaction_refund = Transaction::where('id', $data->transaction_id ?? $data->id)
                 ->where('payee_id', $user_id)
                 ->where('status', TransactionStatus::APPROVED)
                 ->where('type', TransactionType::TRANSFER)
                 ->first();
 
-            if ($Transaction_refund && $Transaction_refund->is_refunded) {
+            if ($sender->balance < $transaction_refund->amount) {
+                throw new Exception('Insufficient balance to refund.');
+            }
+
+            if ($transaction_refund && $transaction_refund->is_refunded) {
                 throw new Exception('This transaction has already been refunded.');
             }
 
-            if (! $Transaction_refund) {
+            if (! $transaction_refund) {
                 throw new Exception('Transaction not found or not eligible for refund.');
             }
 
-            $recipient = User::findOrFail($Transaction_refund->payer_id);
+            $recipient = User::findOrFail($transaction_refund->payer_id);
 
-            $recipient->increment('balance', $Transaction_refund->amount);
-            $sender->decrement('balance', $Transaction_refund->amount);
+            $recipient->increment('balance', $transaction_refund->amount);
+            $sender->decrement('balance', $transaction_refund->amount);
 
             $transaction = Transaction::create([
                 'payer_id' => $sender->id,
                 'payee_id' => $recipient->id,
                 'type' => TransactionType::REFUND,
-                'amount' => $Transaction_refund->amount,
+                'amount' => $transaction_refund->amount,
                 'status' => TransactionStatus::APPROVED,
             ]);
-            $Transaction_refund->is_refunded = true;
-            $Transaction_refund->save();
+            $transaction_refund->is_refunded = true;
+            $transaction_refund->save();
 
             DB::commit();
 
