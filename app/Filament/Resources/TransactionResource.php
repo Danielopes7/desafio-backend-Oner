@@ -129,7 +129,7 @@ class TransactionResource extends Resource
         return [
             'index' => Pages\ListTransactions::route('/'),
             // 'create' => Pages\CreateTransaction::route('/create'),
-            'edit' => Pages\EditTransaction::route('/{record}/edit'),
+            // 'edit' => Pages\EditTransaction::route('/{record}/edit'),
         ];
     }
 
@@ -141,6 +141,7 @@ class TransactionResource extends Resource
             ->where(function ($query) {
                 $query->where('payer_id', Auth::id())
                     ->orWhere('payee_id', Auth::id());
-        });
+            })
+            ->orderByDesc('created_at');
     }
 }
