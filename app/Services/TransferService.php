@@ -26,6 +26,10 @@ class TransferService
             $user_id = Auth::id();
             $sender = User::findOrFail($user_id);
 
+            if ($data->amount <= 0){
+                throw new Exception('Amount must be greater than 0.');
+            }
+
             if (! $sender->canTransfer()) {
                 throw new Exception('Only customers are allowed to make transfers.');
             }

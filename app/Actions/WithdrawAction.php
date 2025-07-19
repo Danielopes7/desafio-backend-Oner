@@ -18,6 +18,10 @@ class WithdrawAction
             $user_id = Auth::id();
             $user = User::findOrFail($user_id);
 
+            if ($data->amount <= 0){
+                throw new Exception('Amount must be greater than 0.');
+            }
+
             if ($user->balance < $data->amount) {
                 throw new Exception('Insufficient balance.');
             }

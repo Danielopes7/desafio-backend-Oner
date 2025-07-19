@@ -38,6 +38,7 @@ class Register extends BaseRegister
     protected function getCpfFormComponent(): Component
     {
         return TextInput::make('cpf_cnpj')
+            ->unique($this->getUserModel())
             ->label('Cpf/CNPJ')
             ->required();
     }

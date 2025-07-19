@@ -16,7 +16,14 @@ class TransactionResource extends Resource
 {
     protected static ?string $model = Transaction::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-arrows-up-down';
+    protected static ?string $modelLabel = 'Transfers';
+    protected static ?string $navigationLabel = 'Transfers';
+
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
 
     public static function form(Form $form): Form
     {
@@ -43,23 +50,34 @@ class TransactionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('payer_id')
+                Tables\Columns\TextColumn::make('payer.name')
+                    ->label('Payer Name')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('payee.name')
+                    ->label('Payee Name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('payee_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('type'),
                 Tables\Columns\TextColumn::make('amount')
                     ->numeric()
+                    ->money('BRL')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status'),
+                Tables\Columns\TextColumn::make('status')
+                    ->icon(fn (string $state): string => match ($state) {
+                    'approved' => 'heroicon-o-check-circle',
+                    'pending'    => 'heroicon-o-ellipsis-horizontal-circle',
+                    default    => 'heroicon-o-question-mark-circle',
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                    'approved' => 'success',
+                    'pending'    => 'warning',
+                    default    => 'gray',
+                    }),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Transfer date')
+                    ->dateTime()
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_refunded')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
@@ -70,7 +88,7 @@ class TransactionResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('refund')
-                    ->label('Reembolsar')
+                    ->label('Refund')
                     ->icon('heroicon-o-arrow-uturn-left')
                     ->color('warning')
                     ->requiresConfirmation()
@@ -82,12 +100,12 @@ class TransactionResource extends Resource
                             app(\App\Services\TransferService::class)->execRefund($record);
 
                             Notification::make()
-                                ->title('Reembolso realizado com sucesso!')
+                                ->title('Refund made successfully!')
                                 ->success()
                                 ->send();
                         } catch (\Throwable $e) {
                             Notification::make()
-                                ->title('Erro ao realizar o reembolso')
+                                ->title('Refund Error')
                                 ->body($e->getMessage())
                                 ->danger()
                                 ->send();
@@ -95,9 +113,7 @@ class TransactionResource extends Resource
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+
             ]);
     }
 
@@ -120,10 +136,11 @@ class TransactionResource extends Resource
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         return parent::getEloquentQuery()
+            ->with(['payer', 'payee'])
             ->where('type', 'transfer')
             ->where(function ($query) {
                 $query->where('payer_id', Auth::id())
                     ->orWhere('payee_id', Auth::id());
-            });
+        });
     }
 }
