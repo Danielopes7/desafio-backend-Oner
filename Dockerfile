@@ -6,6 +6,12 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+RUN apt-get -y update \
+&& apt-get install -y libicu-dev \
+&& docker-php-ext-configure intl \
+&& docker-php-ext-install intl \
+&& docker-php-ext-install zip
+
 WORKDIR /var/www/html
 
 RUN test -f artisan || composer create-project laravel/laravel:^12.0 .
