@@ -47,11 +47,12 @@ Projeto backend desenvolvido com Laravel para simular operações financeiras en
 
 4. Rode as migrations dentro do container:
    ```bash
-   chown -R www-data:www-data storage bootstrap/cache
-   chmod -R 775 storage bootstrap/cache
    composer install
    php artisan key:generate
-   php artisan migrate 
+   php artisan migrate
+
+   chown -R www-data:www-data storage bootstrap/cache
+   chmod -R 775 storage bootstrap/cache 
    ```
 
 5. O serviço estará disponível em: [http://localhost:8000](http://localhost:8000) (ajuste conforme mapeamento de portas no `docker-compose.yml`).
