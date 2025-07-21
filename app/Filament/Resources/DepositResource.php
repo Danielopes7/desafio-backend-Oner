@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 use App\Actions\DepositAction;
+use Filament\Tables\Actions\CreateAction;
 
 class DepositResource extends Resource
 {
@@ -55,7 +56,7 @@ class DepositResource extends Resource
         ->defaultSort('created_at', 'desc')
         ->filters([])
         ->actions([
-            Tables\Actions\EditAction::make()->hidden(), // ocultar edióóo
+            Tables\Actions\EditAction::make()->hidden(),
         ])
         ->headerActions([
             Tables\Actions\CreateAction::make('deposit')
@@ -68,15 +69,26 @@ class DepositResource extends Resource
                         ->numeric()
                         ->gt("0"),
                 ])
-                ->using(function (array $data): \Illuminate\Database\Eloquent\Model {
-                    $deposit = app(DepositAction::class)->handle((object) $data);
+                ->using(function (array $data, CreateAction $action) {
+                    try{
+                        $deposit = app(DepositAction::class)->handle((object) $data);
+    
+                        Notification::make()
+                            ->title('Deposit made successfully!')
+                            ->success()
+                            ->send();
+    
+                        return $deposit;
+                        
+                    } catch(\Throwable $e){
+                        Notification::make()
+                            ->title('Deposit Error')
+                            ->body($e->getMessage())
+                            ->danger()
+                            ->send();
 
-                    Notification::make()
-                        ->title('Deposit made successfully!')
-                        ->success()
-                        ->send();
-
-                    return $deposit;
+                        $action->halt();
+                    }
                 })
                 ->modalSubmitActionLabel('Deposit')
                 ->modalHeading('New Deposit')

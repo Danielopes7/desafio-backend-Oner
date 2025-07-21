@@ -4,6 +4,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Component;
 use Filament\Pages\Auth\Register as BaseRegister;
+use Leandrocfe\FilamentPtbrFormFields\Document;
+
 class Register extends BaseRegister
 {
     protected function getForms(): array
@@ -37,9 +39,8 @@ class Register extends BaseRegister
 
     protected function getCpfFormComponent(): Component
     {
-        return TextInput::make('cpf_cnpj')
-            ->unique($this->getUserModel())
-            ->label('Cpf/CNPJ')
-            ->required();
+        return Document::make('cpf_cnpj')
+            ->label('CPF/CNPJ')
+            ->dynamic();
     }
 }

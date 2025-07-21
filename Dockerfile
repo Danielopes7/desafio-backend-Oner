@@ -12,6 +12,9 @@ RUN apt-get -y update \
 && docker-php-ext-install intl \
 && docker-php-ext-install zip
 
+# Install PHP extensions
+RUN docker-php-ext-install exif pcntl bcmath gd sockets
+
 WORKDIR /var/www/html
 
 RUN test -f artisan || composer create-project laravel/laravel:^12.0 .
