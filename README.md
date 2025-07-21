@@ -42,7 +42,7 @@ Projeto backend desenvolvido com Laravel para simular operações financeiras en
 
 3. Acesse o container da aplicação:
    ```bash
-   docker exec -it <nome_do_container_app> bash
+   docker exec laravel-app bash
    ```
 
 4. Rode as migrations dentro do container:
